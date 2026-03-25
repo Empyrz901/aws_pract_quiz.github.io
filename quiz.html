@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Cloud Practitioner (CLF-C02) Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1923; color: #e8e8e8; min-height: 100vh; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header { text-align: center; padding: 30px 0 20px; }
+  header h1 { font-size: 1.6rem; color: #ff9900; margin-bottom: 6px; }
+  header p { color: #889; font-size: 0.9rem; }
+
+  /* Stats bar */
+  .stats { display: flex; gap: 16px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+  .stat { background: #1a2634; border-radius: 10px; padding: 12px 20px; text-align: center; min-width: 100px; }
+  .stat .num { font-size: 1.5rem; font-weight: 700; color: #ff9900; }
+  .stat .label { font-size: 0.75rem; color: #889; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Progress */
+  .progress-wrap { background: #1a2634; border-radius: 8px; height: 8px; margin: 20px 0; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #ff9900, #ffb84d); border-radius: 8px; transition: width 0.4s ease; }
+
+  /* Start screen */
+  .start-screen { text-align: center; padding: 40px 0; }
+  .start-screen h2 { font-size: 1.3rem; margin-bottom: 20px; }
+  .domain-select { display: flex; flex-direction: column; gap: 10px; max-width: 420px; margin: 0 auto 30px; }
+  .domain-btn { background: #1a2634; border: 2px solid #2a3a4a; color: #e8e8e8; padding: 14px 18px;
+    border-radius: 10px; cursor: pointer; font-size: 0.95rem; text-align: left; transition: all 0.2s; }
+  .domain-btn:hover { border-color: #ff9900; background: #1f2f3f; }
+  .domain-btn.selected { border-color: #ff9900; background: #2a2010; }
+  .domain-btn .tag { display: inline-block; background: #ff990022; color: #ff9900; font-size: 0.7rem;
+    padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 600; }
+  .count-select { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px; }
+  .count-select label { color: #889; font-size: 0.9rem; }
+  .count-select select { background: #1a2634; color: #e8e8e8; border: 2px solid #2a3a4a; border-radius: 8px;
+    padding: 8px 14px; font-size: 1rem; cursor: pointer; }
+  .count-select select:focus { outline: none; border-color: #ff9900; }
+
+  /* Question card */
+  .question-card { background: #1a2634; border-radius: 14px; padding: 30px; margin: 20px 0; }
+  .q-domain { font-size: 0.75rem; color: #ff9900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .q-number { font-size: 0.85rem; color: #667; margin-bottom: 14px; }
+  .q-text { font-size: 1.1rem; line-height: 1.5; margin-bottom: 24px; font-weight: 500; }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option { background: #0f1923; border: 2px solid #2a3a4a; border-radius: 10px; padding: 14px 18px;
+    cursor: pointer; transition: all 0.2s; font-size: 0.95rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 12px; }
+  .option:hover:not(.disabled) { border-color: #ff9900; background: #1f2530; }
+  .option .letter { display: flex; align-items: center; justify-content: center; min-width: 30px; height: 30px;
+    border-radius: 50%; background: #2a3a4a; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .option.correct { border-color: #22c55e; background: #0f2918; }
+  .option.correct .letter { background: #22c55e; color: #000; }
+  .option.wrong { border-color: #ef4444; background: #2a1010; }
+  .option.wrong .letter { background: #ef4444; color: #fff; }
+  .option.disabled { cursor: default; opacity: 0.7; }
+  .option.correct.disabled { opacity: 1; }
+
+  /* Explanation */
+  .explanation { background: #12202e; border-left: 4px solid #ff9900; border-radius: 0 10px 10px 0;
+    padding: 16px 20px; margin-top: 20px; font-size: 0.9rem; line-height: 1.5; color: #bcc; display: none; }
+  .explanation.show { display: block; animation: fadeIn 0.3s ease; }
+
+  /* Buttons */
+  .btn { background: #ff9900; color: #000; border: none; padding: 14px 32px; border-radius: 10px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn:hover { background: #ffb84d; transform: translateY(-1px); }
+  .btn:disabled { background: #4a4a4a; color: #888; cursor: not-allowed; transform: none; }
+  .btn-outline { background: transparent; border: 2px solid #ff9900; color: #ff9900; }
+  .btn-outline:hover { background: #ff990015; }
+  .actions { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
+
+  /* Results */
+  .results { text-align: center; padding: 30px 0; }
+  .results h2 { font-size: 1.8rem; margin-bottom: 8px; }
+  .score-circle { width: 160px; height: 160px; border-radius: 50%; margin: 24px auto;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 2.5rem; font-weight: 800; }
+  .score-circle.pass { background: radial-gradient(circle, #0f291880, #0f2918); border: 4px solid #22c55e; color: #22c55e; }
+  .score-circle.fail { background: radial-gradient(circle, #2a101080, #2a1010); border: 4px solid #ef4444; color: #ef4444; }
+  .score-circle .pct-label { font-size: 0.8rem; font-weight: 400; color: #889; }
+  .results .breakdown { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 24px 0; }
+  .results .bd-item { background: #1a2634; border-radius: 10px; padding: 14px 18px; min-width: 160px; }
+  .results .bd-item .bd-domain { font-size: 0.75rem; color: #889; margin-bottom: 4px; }
+  .results .bd-item .bd-score { font-size: 1.2rem; font-weight: 700; }
+
+  /* Review list */
+  .review-list { text-align: left; margin-top: 20px; }
+  .review-item { background: #1a2634; border-radius: 10px; padding: 18px; margin-bottom: 10px; }
+  .review-item .ri-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .review-item .ri-status { font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+  .review-item .ri-status.correct { background: #22c55e22; color: #22c55e; }
+  .review-item .ri-status.wrong { background: #ef444422; color: #ef4444; }
+  .review-item .ri-q { font-size: 0.95rem; margin-bottom: 6px; }
+  .review-item .ri-answer { font-size: 0.85rem; color: #889; }
+
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Timer */
+  .timer { display: flex; align-items: center; gap: 6px; color: #889; font-size: 0.9rem; }
+  .timer svg { width: 16px; height: 16px; fill: #889; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    .question-card { padding: 20px; }
+    header h1 { font-size: 1.3rem; }
+    .stat { min-width: 70px; padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AWS Cloud Practitioner (CLF-C02)</h1>
+    <p>Interactive Practice Quiz</p>
+  </header>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="start-screen">
+    <h2>Choose your quiz</h2>
+    <div class="domain-select">
+      <button class="domain-btn selected" data-domain="all" onclick="selectDomain(this)">
+        All Domains <span class="tag">90 Q</span>
+      </button>
+      <button class="domain-btn" data-domain="1" onclick="selectDomain(this)">
+        Domain 1: Cloud Concepts <span class="tag">24%</span>
+      </button>
+      <button class="domain-btn" data-domain="2" onclick="selectDomain(this)">
+        Domain 2: Security &amp; Compliance <span class="tag">30%</span>
+      </button>
+      <button class="domain-btn" data-domain="3" onclick="selectDomain(this)">
+        Domain 3: Cloud Technology &amp; Services <span class="tag">34%</span>
+      </button>
+      <button class="domain-btn" data-domain="4" onclick="selectDomain(this)">
+        Domain 4: Billing, Pricing &amp; Support <span class="tag">12%</span>
+      </button>
+    </div>
+    <div class="count-select">
+      <label>Number of questions:</label>
+      <select id="q-count">
+        <option value="10">10</option>
+        <option value="20" selected>20</option>
+        <option value="30">30</option>
+        <option value="50">50</option>
+        <option value="0">All available</option>
+      </select>
+      <label style="margin-left:12px">
+        <input type="checkbox" id="shuffle-toggle" checked style="accent-color:#ff9900"> Shuffle
+      </label>
+    </div>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" class="hidden">
+    <div class="stats">
+      <div class="stat"><div class="num" id="s-question">-</div><div class="label">Question</div></div>
+      <div class="stat"><div class="num" id="s-correct" style="color:#22c55e">0</div><div class="label">Correct</div></div>
+      <div class="stat"><div class="num" id="s-wrong" style="color:#ef4444">0</div><div class="label">Wrong</div></div>
+      <div class="stat">
+        <div class="timer" id="s-timer"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 11h-2V7h2v6zm0 4h-2v-2h2v2z"/></svg><span id="timer-text">00:00</span></div>
+        <div class="label">Time</div>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+
+    <div class="question-card">
+      <div class="q-domain" id="q-domain"></div>
+      <div class="q-number" id="q-number"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="explanation" id="q-explanation"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-outline hidden" id="btn-skip" onclick="skipQuestion()">Skip</button>
+      <button class="btn hidden" id="btn-next" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" class="hidden results"></div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // DOMAIN 1 — Cloud Concepts (24%)
+  { domain: 1, task: "1.1", q: "Which of the following is a benefit of the AWS global infrastructure?",
+    opts: ["Reduced need for encryption","Speed of deployment and global reach","Elimination of all operational costs","Automatic code deployment"],
+    ans: 1, explain: "AWS's global infrastructure (Regions, AZs, edge locations) enables fast deployment worldwide." },
+  { domain: 1, task: "1.1", q: "A company wants to avoid large upfront hardware purchases and instead pay only for what they use. Which cloud benefit does this describe?",
+    opts: ["Elasticity","High availability","Variable expense instead of capital expense","Fault tolerance"],
+    ans: 2, explain: "The cloud shifts from capital expense (CapEx) to variable/operational expense (OpEx)." },
+  { domain: 1, task: "1.1", q: "What does \"elasticity\" mean in the context of AWS?",
+    opts: ["The ability to acquire resources when needed and release them when no longer needed","The ability to withstand component failures","The ability to run applications in multiple Regions","The ability to use managed services"],
+    ans: 0, explain: "Elasticity is the capacity to scale resources up and down dynamically based on demand." },
+  { domain: 1, task: "1.1", q: "Which advantage of cloud computing allows a company to deploy applications in multiple AWS Regions around the world with just a few clicks?",
+    opts: ["Economy of scale","Agility","High availability","Go global in minutes"],
+    ans: 3, explain: "\"Go global in minutes\" is one of the six advantages of cloud computing defined by AWS." },
+  { domain: 1, task: "1.2", q: "How many pillars does the AWS Well-Architected Framework have?",
+    opts: ["4","5","6","7"],
+    ans: 2, explain: "Six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, Sustainability." },
+  { domain: 1, task: "1.2", q: "Which pillar of the AWS Well-Architected Framework focuses on minimizing environmental impacts of running cloud workloads?",
+    opts: ["Cost Optimization","Operational Excellence","Sustainability","Reliability"],
+    ans: 2, explain: "The Sustainability pillar focuses on reducing energy consumption and environmental impact." },
+  { domain: 1, task: "1.2", q: "Which Well-Architected pillar includes the ability to recover from infrastructure or service disruptions?",
+    opts: ["Performance Efficiency","Security","Operational Excellence","Reliability"],
+    ans: 3, explain: "Reliability includes the ability to recover from failures and dynamically meet demand." },
+  { domain: 1, task: "1.3", q: "An organization is planning to move large volumes of on-premises data to AWS but has limited network bandwidth. Which service should they use?",
+    opts: ["AWS Direct Connect","AWS Snowball","Amazon Kinesis","AWS VPN"],
+    ans: 1, explain: "AWS Snowball is a physical data transport solution for migrating large datasets when network transfer is impractical." },
+  { domain: 1, task: "1.3", q: "Which framework helps organizations plan and execute their migration to the AWS Cloud by identifying business and technology capabilities?",
+    opts: ["AWS Well-Architected Framework","AWS Cloud Adoption Framework (AWS CAF)","AWS Trusted Advisor","AWS Migration Hub"],
+    ans: 1, explain: "AWS CAF provides guidance across six perspectives for cloud adoption planning." },
+  { domain: 1, task: "1.3", q: "What are the benefits of cloud adoption according to the AWS CAF? (Choose TWO)",
+    opts: ["Reduced business risk","Increased capital expenditure","Increased operational efficiency","Elimination of all security responsibilities","Reduced need for compliance"],
+    ans: [0,2], multi: true, explain: "AWS CAF highlights reduced business risk, increased revenue, and improved operational efficiency." },
+  { domain: 1, task: "1.4", q: "What is the concept of \"rightsizing\" in AWS?",
+    opts: ["Selecting the most expensive instance type for guaranteed performance","Matching instance types and sizes to workload requirements at the lowest possible cost","Buying the largest Reserved Instance available","Using only Spot Instances for all workloads"],
+    ans: 1, explain: "Rightsizing means selecting the optimal instance type/size to avoid over- or under-provisioning." },
+  { domain: 1, task: "1.4", q: "Which costs should be included when estimating on-premises expenses? (Choose TWO)",
+    opts: ["Data transfer charges","Physical facility maintenance","Server hardware and power costs","AWS Support plan costs","Amazon CloudWatch charges"],
+    ans: [1,2], multi: true, explain: "On-premises costs include hardware, power, cooling, physical space, and staff." },
+  { domain: 1, task: "1.4", q: "Which statement best describes the economies of scale advantage of cloud computing?",
+    opts: ["Customers always pay the same price regardless of usage","AWS achieves lower variable costs than individual companies because of aggregate usage","Cloud resources are unlimited and free","Economies of scale only apply to storage"],
+    ans: 1, explain: "AWS aggregates usage from hundreds of thousands of customers, achieving higher economies of scale." },
+
+  // DOMAIN 2 — Security & Compliance (30%)
+  { domain: 2, task: "2.1", q: "Under the AWS shared responsibility model, which of the following is the customer's responsibility?",
+    opts: ["Patching the hypervisor","Physical security of data centers","Configuring security groups and NACLs","Maintaining the network infrastructure"],
+    ans: 2, explain: "Customers are responsible for security \"in\" the cloud: data, identity management, firewall configuration." },
+  { domain: 2, task: "2.1", q: "Under the shared responsibility model, who is responsible for patching the operating system on Amazon EC2 instances?",
+    opts: ["AWS","The customer","Both AWS and the customer equally","Neither \u2014 it is automatic"],
+    ans: 1, explain: "For EC2, the customer manages the guest OS, including patching and updates." },
+  { domain: 2, task: "2.1", q: "For which AWS service does the responsibility for patching the operating system shift to AWS?",
+    opts: ["Amazon EC2","Amazon RDS","Self-managed databases on EC2","Amazon WorkSpaces (BYOL)"],
+    ans: 1, explain: "With managed services like Amazon RDS, AWS manages the underlying OS and database engine patching." },
+  { domain: 2, task: "2.1", q: "Which of the following is ALWAYS an AWS responsibility, regardless of the service used?",
+    opts: ["Data encryption configuration","IAM policy management","Physical security of data centers","Application-level firewall rules"],
+    ans: 2, explain: "AWS is always responsible for the security \"of\" the cloud: physical infrastructure, hardware, facilities." },
+  { domain: 2, task: "2.2", q: "Which AWS service provides access to AWS compliance reports and agreements (such as SOC and PCI)?",
+    opts: ["AWS Config","AWS Artifact","Amazon Inspector","AWS CloudTrail"],
+    ans: 1, explain: "AWS Artifact is a self-service portal for on-demand access to AWS compliance documentation." },
+  { domain: 2, task: "2.2", q: "Which AWS service continuously monitors API calls and user activity for auditing purposes?",
+    opts: ["Amazon CloudWatch","AWS CloudTrail","AWS Config","Amazon GuardDuty"],
+    ans: 1, explain: "AWS CloudTrail records API calls made on your account for governance and compliance auditing." },
+  { domain: 2, task: "2.2", q: "A company must ensure that data is encrypted both in transit and at rest. Which options does AWS provide? (Choose TWO)",
+    opts: ["SSL/TLS certificates for data in transit","AWS KMS for encryption at rest","AWS Artifact for encryption","Amazon Route 53 for encryption","AWS CloudFormation for encryption"],
+    ans: [0,1], multi: true, explain: "AWS supports SSL/TLS for transit encryption and AWS KMS for managing encryption at rest." },
+  { domain: 2, task: "2.2", q: "Which service provides automated security assessments to help improve security and compliance of applications on AWS?",
+    opts: ["AWS Trusted Advisor","Amazon Inspector","AWS Artifact","AWS Shield"],
+    ans: 1, explain: "Amazon Inspector automatically assesses applications for vulnerabilities and deviations from best practices." },
+  { domain: 2, task: "2.2", q: "Which AWS service provides a centralized view of security alerts and compliance status across multiple AWS accounts?",
+    opts: ["Amazon GuardDuty","AWS Security Hub","AWS CloudTrail","Amazon Macie"],
+    ans: 1, explain: "AWS Security Hub aggregates, organizes, and prioritizes security findings from multiple AWS services." },
+  { domain: 2, task: "2.3", q: "What should be done to protect the AWS root user account? (Choose TWO)",
+    opts: ["Use it for daily administrative tasks","Enable multi-factor authentication (MFA)","Share root credentials with the team","Delete all root access keys","Use root for deploying applications"],
+    ans: [1,3], multi: true, explain: "Best practices: enable MFA on root, delete root access keys, don't use root for everyday tasks." },
+  { domain: 2, task: "2.3", q: "Which AWS service allows centralized management of user access to multiple AWS accounts and business applications?",
+    opts: ["AWS IAM","AWS IAM Identity Center (AWS Single Sign-On)","Amazon Cognito","AWS Directory Service"],
+    ans: 1, explain: "IAM Identity Center provides single sign-on access to multiple AWS accounts and applications." },
+  { domain: 2, task: "2.3", q: "What is the principle of least privilege?",
+    opts: ["Granting all users full administrative access","Granting users only the permissions they need to perform their job","Denying all access by default and never granting permissions","Using the root account for all operations"],
+    ans: 1, explain: "Least privilege means granting the minimum permissions necessary for a user to complete their tasks." },
+  { domain: 2, task: "2.3", q: "Which authentication method adds an extra layer of protection on top of a username and password?",
+    opts: ["Access keys","SSH key pairs","Multi-factor authentication (MFA)","Security groups"],
+    ans: 2, explain: "MFA requires a second form of authentication (e.g., a device-generated code) in addition to a password." },
+  { domain: 2, task: "2.3", q: "Where should an application running on Amazon EC2 store database credentials securely?",
+    opts: ["Hard-coded in the application source code","In an environment variable on the instance","In AWS Secrets Manager","In a public S3 bucket"],
+    ans: 2, explain: "AWS Secrets Manager securely stores, rotates, and retrieves credentials and other secrets." },
+  { domain: 2, task: "2.4", q: "Which AWS service provides managed DDoS protection?",
+    opts: ["AWS WAF","AWS Shield","Amazon GuardDuty","AWS Firewall Manager"],
+    ans: 1, explain: "AWS Shield (Standard and Advanced) provides DDoS protection. Standard is automatically enabled at no cost." },
+  { domain: 2, task: "2.4", q: "Which service acts as a web application firewall to filter malicious web traffic?",
+    opts: ["AWS Shield","Security Groups","AWS WAF","Network ACLs"],
+    ans: 2, explain: "AWS WAF lets you create rules to filter web traffic and protect against exploits like SQL injection and XSS." },
+  { domain: 2, task: "2.4", q: "Which AWS service uses machine learning to detect threats such as unusual API calls or potentially compromised instances?",
+    opts: ["AWS Config","Amazon GuardDuty","AWS CloudTrail","Amazon Inspector"],
+    ans: 1, explain: "Amazon GuardDuty is a threat detection service that continuously monitors for malicious activity." },
+  { domain: 2, task: "2.4", q: "Which AWS tool provides best-practice recommendations across categories including security?",
+    opts: ["AWS CloudTrail","AWS Trusted Advisor","AWS Config","Amazon CloudWatch"],
+    ans: 1, explain: "AWS Trusted Advisor inspects your environment and provides recommendations on security, cost, performance, fault tolerance, and service limits." },
+
+  // DOMAIN 3 — Cloud Technology & Services (34%)
+  { domain: 3, task: "3.1", q: "Which are valid ways to access AWS services? (Choose THREE)",
+    opts: ["AWS Management Console","AWS CLI","AWS SDKs","SSH directly to AWS data centers","Physical access to servers"],
+    ans: [0,1,2], multi: true, explain: "AWS services can be accessed via the Console (web), CLI (command line), and SDKs (programmatic)." },
+  { domain: 3, task: "3.1", q: "Which AWS service enables you to define infrastructure as code using templates?",
+    opts: ["AWS CodePipeline","AWS CloudFormation","AWS CodeBuild","AWS Config"],
+    ans: 1, explain: "AWS CloudFormation lets you model and provision AWS resources using JSON or YAML templates." },
+  { domain: 3, task: "3.1", q: "Which cloud deployment model uses both on-premises infrastructure and AWS Cloud resources?",
+    opts: ["Cloud-native","On-premises","Hybrid","Multi-cloud"],
+    ans: 2, explain: "A hybrid deployment connects on-premises infrastructure to AWS Cloud resources." },
+  { domain: 3, task: "3.2", q: "What is the relationship between AWS Regions and Availability Zones?",
+    opts: ["Each Availability Zone contains multiple Regions","Each Region contains two or more Availability Zones","Regions and Availability Zones are the same thing","Availability Zones are only available in the US"],
+    ans: 1, explain: "Each AWS Region consists of multiple isolated Availability Zones connected by low-latency networking." },
+  { domain: 3, task: "3.2", q: "Which infrastructure component is specifically designed to deliver content to end users with low latency?",
+    opts: ["Availability Zones","AWS Regions","Edge locations (Amazon CloudFront)","AWS Outposts"],
+    ans: 2, explain: "Edge locations are used by Amazon CloudFront to cache content closer to end users." },
+  { domain: 3, task: "3.2", q: "A company needs to ensure that the failure of one data center does not take down their application. What should they do?",
+    opts: ["Use a single large EC2 instance","Deploy resources across multiple Availability Zones","Use only Spot Instances","Deploy to a single Availability Zone with backups"],
+    ans: 1, explain: "Multiple AZs provide high availability since AZs are physically separate and do not share single points of failure." },
+  { domain: 3, task: "3.2", q: "When should a company use multiple AWS Regions? (Choose TWO)",
+    opts: ["To reduce latency for global users","To comply with data sovereignty requirements","To use a different programming language per Region","To increase the number of AZs in a single Region","To avoid using IAM"],
+    ans: [0,1], multi: true, explain: "Multiple Regions are used for disaster recovery, low latency for global users, and data residency compliance." },
+  { domain: 3, task: "3.3", q: "Which EC2 instance type is best suited for a machine learning training workload that requires high CPU performance?",
+    opts: ["Storage optimized","Memory optimized","Compute optimized","General purpose"],
+    ans: 2, explain: "Compute optimized instances (C-family) are ideal for CPU-intensive workloads like ML training." },
+  { domain: 3, task: "3.3", q: "Which AWS service allows you to run containers without managing servers or clusters?",
+    opts: ["Amazon EC2","AWS Lambda","AWS Fargate","Amazon Lightsail"],
+    ans: 2, explain: "AWS Fargate is a serverless compute engine for containers that works with ECS and EKS." },
+  { domain: 3, task: "3.3", q: "Which AWS service runs code in response to events without provisioning or managing servers?",
+    opts: ["Amazon EC2","AWS Fargate","AWS Lambda","Amazon ECS"],
+    ans: 2, explain: "AWS Lambda is a serverless compute service that runs code in response to triggers." },
+  { domain: 3, task: "3.3", q: "Which feature automatically adjusts the number of EC2 instances based on demand?",
+    opts: ["Elastic Load Balancing","Amazon EC2 Auto Scaling","AWS CloudFormation","Amazon CloudFront"],
+    ans: 1, explain: "EC2 Auto Scaling automatically adds or removes instances based on defined conditions." },
+  { domain: 3, task: "3.3", q: "What is the primary purpose of Elastic Load Balancing (ELB)?",
+    opts: ["To store data across multiple Availability Zones","To distribute incoming traffic across multiple targets","To manage DNS records","To encrypt data in transit"],
+    ans: 1, explain: "ELB distributes incoming application traffic across multiple targets for availability and fault tolerance." },
+  { domain: 3, task: "3.4", q: "Which AWS database service is fully managed, relational, compatible with MySQL and PostgreSQL, and offers up to 5x the performance of standard MySQL?",
+    opts: ["Amazon RDS","Amazon DynamoDB","Amazon Aurora","Amazon Redshift"],
+    ans: 2, explain: "Amazon Aurora is a MySQL- and PostgreSQL-compatible relational database with enhanced performance." },
+  { domain: 3, task: "3.4", q: "Which AWS service is a fully managed NoSQL key-value and document database?",
+    opts: ["Amazon RDS","Amazon Aurora","Amazon DynamoDB","Amazon Redshift"],
+    ans: 2, explain: "Amazon DynamoDB is a serverless NoSQL database that delivers single-digit millisecond performance." },
+  { domain: 3, task: "3.4", q: "A company needs an in-memory caching solution to improve read performance. Which service should they use?",
+    opts: ["Amazon RDS","Amazon ElastiCache","Amazon S3","Amazon DynamoDB"],
+    ans: 1, explain: "Amazon ElastiCache provides in-memory caching (Redis or Memcached) for microsecond response times." },
+  { domain: 3, task: "3.4", q: "Which service helps migrate databases from on-premises to AWS with minimal downtime?",
+    opts: ["AWS Snowball","AWS Database Migration Service (AWS DMS)","AWS DataSync","Amazon Kinesis"],
+    ans: 1, explain: "AWS DMS helps migrate databases to AWS while keeping the source database operational during migration." },
+  { domain: 3, task: "3.5", q: "What is an Amazon VPC?",
+    opts: ["A virtual private server","A logically isolated section of the AWS Cloud where you launch resources","A type of EC2 instance","A DNS management service"],
+    ans: 1, explain: "Amazon VPC lets you provision a logically isolated network within AWS." },
+  { domain: 3, task: "3.5", q: "Which VPC component acts as a stateless firewall at the subnet level?",
+    opts: ["Security group","Internet gateway","Network ACL (Access Control List)","Route table"],
+    ans: 2, explain: "Network ACLs are stateless firewalls that control traffic at the subnet level." },
+  { domain: 3, task: "3.5", q: "Which VPC component acts as a stateful firewall at the instance level?",
+    opts: ["Network ACL","Security group","NAT gateway","Internet gateway"],
+    ans: 1, explain: "Security groups are stateful firewalls controlling inbound and outbound traffic at the instance level." },
+  { domain: 3, task: "3.5", q: "Which service provides a dedicated private connection from an on-premises data center to AWS?",
+    opts: ["AWS VPN","AWS Direct Connect","Amazon CloudFront","AWS Transit Gateway"],
+    ans: 1, explain: "AWS Direct Connect establishes a dedicated, private network connection from your premises to AWS." },
+  { domain: 3, task: "3.5", q: "Which AWS service provides DNS and domain registration?",
+    opts: ["Amazon CloudFront","Amazon Route 53","Elastic Load Balancing","AWS Global Accelerator"],
+    ans: 1, explain: "Amazon Route 53 is a scalable DNS web service for domain registration and DNS routing." },
+  { domain: 3, task: "3.6", q: "Which Amazon S3 storage class is the most cost-effective for data that is rarely accessed and can tolerate retrieval times of 12+ hours?",
+    opts: ["S3 Standard","S3 Intelligent-Tiering","S3 Glacier Deep Archive","S3 One Zone-IA"],
+    ans: 2, explain: "S3 Glacier Deep Archive is the lowest-cost storage class with retrieval times of 12+ hours." },
+  { domain: 3, task: "3.6", q: "Which storage service provides block-level storage volumes for use with EC2 instances?",
+    opts: ["Amazon S3","Amazon EFS","Amazon EBS","AWS Storage Gateway"],
+    ans: 2, explain: "Amazon EBS provides persistent block storage volumes for EC2 instances." },
+  { domain: 3, task: "3.6", q: "Which storage service provides a shared file system that can be accessed by multiple EC2 instances simultaneously?",
+    opts: ["Amazon EBS","Amazon S3","Amazon EFS","Instance store"],
+    ans: 2, explain: "Amazon EFS is a scalable, fully managed NFS file system for use with AWS services." },
+  { domain: 3, task: "3.6", q: "What happens to data stored on an EC2 instance store when the instance is stopped or terminated?",
+    opts: ["Data is preserved indefinitely","Data is automatically backed up to S3","Data is lost (ephemeral storage)","Data is moved to EBS"],
+    ans: 2, explain: "Instance store is ephemeral; data is lost when the instance is stopped, terminated, or fails." },
+  { domain: 3, task: "3.6", q: "Which service provides a centralized place to manage backups across AWS services?",
+    opts: ["Amazon S3 Lifecycle policies","AWS Backup","AWS Storage Gateway","Amazon EBS Snapshots only"],
+    ans: 1, explain: "AWS Backup is a fully managed service to centralize and automate data protection across AWS services." },
+  { domain: 3, task: "3.7", q: "Which AWS service can be used to build, train, and deploy machine learning models?",
+    opts: ["Amazon Lex","Amazon SageMaker AI","Amazon Rekognition","Amazon Comprehend"],
+    ans: 1, explain: "Amazon SageMaker AI provides a fully managed environment for building, training, and deploying ML models." },
+  { domain: 3, task: "3.7", q: "Which AWS service allows you to run SQL queries directly against data stored in Amazon S3?",
+    opts: ["Amazon RDS","Amazon Redshift","Amazon Athena","Amazon DynamoDB"],
+    ans: 2, explain: "Amazon Athena is a serverless query service that uses standard SQL to analyze data in S3." },
+  { domain: 3, task: "3.7", q: "Which service is used to build conversational chatbots?",
+    opts: ["Amazon Polly","Amazon Lex","Amazon Transcribe","Amazon Kendra"],
+    ans: 1, explain: "Amazon Lex provides the technology to build conversational interfaces (chatbots) using voice and text." },
+  { domain: 3, task: "3.7", q: "Which AWS service is a fully managed ETL (extract, transform, load) service for analytics?",
+    opts: ["Amazon Athena","AWS Glue","Amazon Kinesis","Amazon QuickSight"],
+    ans: 1, explain: "AWS Glue is a serverless data integration service for discovering, preparing, and combining data." },
+  { domain: 3, task: "3.8", q: "Which AWS service is used to decouple application components by sending messages between them via a queue?",
+    opts: ["Amazon SNS","Amazon SQS","Amazon EventBridge","AWS Step Functions"],
+    ans: 1, explain: "Amazon SQS is a fully managed message queuing service for decoupling microservices." },
+  { domain: 3, task: "3.8", q: "Which service sends push notifications to subscribers via SMS, email, or HTTP endpoints?",
+    opts: ["Amazon SQS","Amazon SES","Amazon SNS","Amazon EventBridge"],
+    ans: 2, explain: "Amazon SNS is a pub/sub messaging service for sending notifications to subscribers." },
+  { domain: 3, task: "3.8", q: "Which AWS service provides a cloud-based contact center?",
+    opts: ["Amazon WorkSpaces","Amazon Connect","Amazon Chime","Amazon SES"],
+    ans: 1, explain: "Amazon Connect is an omnichannel cloud contact center service." },
+  { domain: 3, task: "3.8", q: "Which service provides virtual cloud desktops for end users?",
+    opts: ["Amazon AppStream 2.0","Amazon WorkSpaces","AWS Cloud9","Amazon Lightsail"],
+    ans: 1, explain: "Amazon WorkSpaces is a managed Desktop-as-a-Service (DaaS) for provisioning virtual cloud desktops." },
+
+  // DOMAIN 4 — Billing, Pricing & Support (12%)
+  { domain: 4, task: "4.1", q: "Which EC2 pricing option provides the largest discount (up to 90%) but can be interrupted by AWS with a 2-minute notice?",
+    opts: ["On-Demand Instances","Reserved Instances","Spot Instances","Dedicated Hosts"],
+    ans: 2, explain: "Spot Instances offer steep discounts for fault-tolerant workloads but can be reclaimed by AWS." },
+  { domain: 4, task: "4.1", q: "A company has a steady-state workload running 24/7 for the next 3 years. Which pricing model offers the best savings?",
+    opts: ["On-Demand Instances","Spot Instances","Reserved Instances (3-year term)","Dedicated Instances"],
+    ans: 2, explain: "Reserved Instances provide significant savings (up to 72%) for predictable, long-running workloads." },
+  { domain: 4, task: "4.1", q: "Which pricing model offers flexibility across EC2, Lambda, and Fargate with a commitment to consistent usage ($/hour)?",
+    opts: ["Reserved Instances","Spot Instances","AWS Savings Plans","On-Demand Instances"],
+    ans: 2, explain: "Savings Plans offer lower prices for committing to consistent usage, with flexibility across services." },
+  { domain: 4, task: "4.1", q: "Which of the following is generally free when transferring data in AWS?",
+    opts: ["Data transfer out to the internet","Data transfer between Regions","Data transfer into AWS from the internet (inbound)","Data transfer out from Amazon S3"],
+    ans: 2, explain: "Inbound data transfer from the internet to AWS is generally free." },
+  { domain: 4, task: "4.1", q: "Which EC2 option provides a physical server dedicated entirely to a single customer's use?",
+    opts: ["Reserved Instances","Spot Instances","Dedicated Hosts","On-Demand Instances"],
+    ans: 2, explain: "Dedicated Hosts provide physical servers for your exclusive use, useful for compliance or licensing." },
+  { domain: 4, task: "4.2", q: "Which AWS tool lets you visualize, understand, and manage your cloud costs and usage over time?",
+    opts: ["AWS Budgets","AWS Cost Explorer","AWS Pricing Calculator","AWS Organizations"],
+    ans: 1, explain: "AWS Cost Explorer provides an interface to visualize and analyze your AWS spending patterns." },
+  { domain: 4, task: "4.2", q: "Which service allows you to set custom cost and usage alerts that notify you when thresholds are exceeded?",
+    opts: ["AWS Cost Explorer","AWS Budgets","AWS Trusted Advisor","Amazon CloudWatch"],
+    ans: 1, explain: "AWS Budgets lets you set custom budgets and receive alerts when costs exceed your thresholds." },
+  { domain: 4, task: "4.2", q: "A company wants to estimate the cost of a new AWS architecture before deploying it. Which tool should they use?",
+    opts: ["AWS Cost Explorer","AWS Budgets","AWS Pricing Calculator","AWS Trusted Advisor"],
+    ans: 2, explain: "AWS Pricing Calculator lets you estimate the cost of AWS services before committing." },
+  { domain: 4, task: "4.2", q: "Which feature of AWS Organizations allows a company to receive a single bill for all member accounts?",
+    opts: ["Service control policies","Consolidated billing","AWS Budgets","Cost allocation tags"],
+    ans: 1, explain: "Consolidated billing combines usage across accounts for a single bill and potential volume discounts." },
+  { domain: 4, task: "4.2", q: "What are cost allocation tags used for?",
+    opts: ["To restrict access to AWS resources","To organize and track AWS costs by project, department, or environment","To encrypt data at rest","To configure auto scaling"],
+    ans: 1, explain: "Cost allocation tags let you categorize resources for detailed cost tracking in billing reports." },
+  { domain: 4, task: "4.3", q: "Which AWS Support plan provides access to a Technical Account Manager (TAM)?",
+    opts: ["Basic","Developer","Business","Enterprise"],
+    ans: 3, explain: "Only Enterprise and Enterprise On-Ramp plans include a designated Technical Account Manager." },
+  { domain: 4, task: "4.3", q: "Which AWS Support plan is available to all AWS customers at no additional cost?",
+    opts: ["Developer","Business","Basic","Enterprise On-Ramp"],
+    ans: 2, explain: "Basic Support is free for all AWS customers." },
+  { domain: 4, task: "4.3", q: "Where can a customer find community-driven questions and answers about AWS?",
+    opts: ["AWS Artifact","AWS re:Post","AWS Trusted Advisor","AWS Personal Health Dashboard"],
+    ans: 1, explain: "AWS re:Post is a community-driven Q&A service for AWS technical questions." },
+  { domain: 4, task: "4.3", q: "Which dashboard provides personalized alerts about AWS service health events affecting your resources?",
+    opts: ["AWS Trusted Advisor","Amazon CloudWatch","AWS Health Dashboard","AWS Cost Explorer"],
+    ans: 2, explain: "AWS Health Dashboard provides personalized view of the health of AWS services impacting your resources." },
+  { domain: 4, task: "4.3", q: "A company discovers AWS resources being used for malicious purposes. Which team should they report this to?",
+    opts: ["AWS Support","AWS Trust and Safety team","AWS Professional Services","AWS Partner Network"],
+    ans: 1, explain: "The AWS Trust and Safety team handles reports of abuse of AWS resources." },
+  { domain: 4, task: "4.3", q: "Which service allows organizations to find, test, buy, and deploy third-party software on AWS?",
+    opts: ["AWS Partner Network","AWS Marketplace","Amazon AppStream","AWS Service Catalog"],
+    ans: 1, explain: "AWS Marketplace is a curated digital catalog for third-party software and services." },
+
+  // BONUS — Mixed
+  { domain: 3, task: "3.8", q: "Which service should be used to monitor application performance metrics such as CPU utilization and network throughput?",
+    opts: ["AWS CloudTrail","Amazon CloudWatch","AWS Config","AWS X-Ray"],
+    ans: 1, explain: "Amazon CloudWatch collects and tracks metrics, monitors log files, and sets alarms." },
+  { domain: 2, task: "2.4", q: "What is the difference between a security group and a network ACL?",
+    opts: ["Security groups are stateless; NACLs are stateful","Security groups operate at the instance level and are stateful; NACLs operate at the subnet level and are stateless","They are identical","NACLs only apply to outbound traffic"],
+    ans: 1, explain: "Security groups: stateful, instance level. NACLs: stateless, subnet level." },
+  { domain: 2, task: "2.2", q: "Which AWS service tracks resource configuration changes and evaluates compliance against desired configurations?",
+    opts: ["AWS CloudTrail","AWS Config","Amazon Inspector","AWS Trusted Advisor"],
+    ans: 1, explain: "AWS Config continuously records resource configurations and evaluates them against rules." },
+  { domain: 3, task: "3.3", q: "A startup wants a simple way to launch a small website with a pre-configured server at a predictable monthly cost. Which service is most appropriate?",
+    opts: ["Amazon EC2","AWS Lambda","Amazon Lightsail","AWS Elastic Beanstalk"],
+    ans: 2, explain: "Amazon Lightsail offers simple virtual servers at a low, predictable monthly price." },
+  { domain: 3, task: "3.1", q: "Which service allows developers to deploy and manage applications without worrying about the underlying infrastructure?",
+    opts: ["Amazon EC2","AWS Elastic Beanstalk","AWS CloudFormation","Amazon ECS"],
+    ans: 1, explain: "AWS Elastic Beanstalk is a PaaS that handles deployment, scaling, and management." },
+  { domain: 3, task: "3.6", q: "Which of the following describes Amazon S3?",
+    opts: ["Block storage for EC2 instances","Object storage with virtually unlimited capacity","In-memory database service","File storage for Linux workloads"],
+    ans: 1, explain: "Amazon S3 is an object storage service offering industry-leading scalability and durability." },
+  { domain: 3, task: "3.2", q: "What is the purpose of Amazon CloudFront?",
+    opts: ["Manage DNS records","Provide DDoS protection","Content delivery network (CDN) that caches content at edge locations","Store objects with versioning"],
+    ans: 2, explain: "Amazon CloudFront is a CDN that distributes content globally through edge locations." },
+  { domain: 3, task: "3.8", q: "Which service helps trace requests as they travel through a distributed application for debugging?",
+    opts: ["AWS CloudTrail","Amazon CloudWatch","AWS X-Ray","AWS Config"],
+    ans: 2, explain: "AWS X-Ray helps analyze and debug distributed applications by tracing requests end-to-end." },
+];
+
+const DOMAIN_NAMES = {
+  1: "Domain 1: Cloud Concepts",
+  2: "Domain 2: Security & Compliance",
+  3: "Domain 3: Cloud Technology & Services",
+  4: "Domain 4: Billing, Pricing & Support"
+};
+
+let quiz = [], current = 0, score = 0, wrong = 0, answered = false, results = [], timerInterval, seconds = 0;
+let selectedDomain = "all";
+
+function selectDomain(btn) {
+  document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDomain = btn.dataset.domain;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz() {
+  let pool = selectedDomain === "all" ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.domain == selectedDomain);
+  if (document.getElementById('shuffle-toggle').checked) pool = shuffle(pool);
+  let count = parseInt(document.getElementById('q-count').value);
+  if (count === 0 || count > pool.length) count = pool.length;
+  quiz = pool.slice(0, count);
+  current = 0; score = 0; wrong = 0; results = []; answered = false; seconds = 0;
+
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  startTimer();
+  renderQuestion();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    seconds++;
+    const m = String(Math.floor(seconds/60)).padStart(2,'0');
+    const s = String(seconds%60).padStart(2,'0');
+    document.getElementById('timer-text').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function renderQuestion() {
+  const q = quiz[current];
+  answered = false;
+  document.getElementById('s-question').textContent = `${current+1}/${quiz.length}`;
+  document.getElementById('s-correct').textContent = score;
+  document.getElementById('s-wrong').textContent = wrong;
+  document.getElementById('progress-bar').style.width = `${((current)/quiz.length)*100}%`;
+  document.getElementById('q-domain').textContent = DOMAIN_NAMES[q.domain] + ` \u2022 Task ${q.task}`;
+  document.getElementById('q-number').textContent = `Question ${current+1} of ${quiz.length}`;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = 'ABCDE';
+  const optsHtml = q.opts.map((opt, i) =>
+    `<div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="letter">${letters[i]}</span><span>${opt}</span>
+    </div>`
+  ).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+
+  const exp = document.getElementById('q-explanation');
+  exp.classList.remove('show');
+  exp.textContent = '';
+
+  document.getElementById('btn-skip').classList.remove('hidden');
+  document.getElementById('btn-next').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quiz[current];
+  const isMulti = q.multi;
+  const correctIndices = isMulti ? q.ans : [q.ans];
+  const isCorrect = correctIndices.includes(idx);
+
+  const optEls = document.querySelectorAll('.option');
+  optEls.forEach(el => {
+    el.classList.add('disabled');
+    const i = parseInt(el.dataset.idx);
+    if (correctIndices.includes(i)) el.classList.add('correct');
+  });
+  if (!isCorrect) {
+    optEls[idx].classList.add('wrong');
+    wrong++;
+  } else {
+    score++;
+  }
+
+  results.push({ q: q.q, correct: isCorrect, yourAnswer: q.opts[idx], rightAnswer: correctIndices.map(i => q.opts[i]).join(', '), explain: q.explain });
+
+  document.getElementById('s-correct').textContent = score;
+  document.getElementById('s-wrong').textContent = wrong;
+
+  const exp = document.getElementById('q-explanation');
+  exp.textContent = q.explain;
+  exp.classList.add('show');
+
+  document.getElementById('btn-skip').classList.add('hidden');
+  document.getElementById('btn-next').classList.remove('hidden');
+  document.getElementById('btn-next').textContent = current < quiz.length - 1 ? 'Next' : 'See Results';
+}
+
+function skipQuestion() {
+  if (answered) return;
+  wrong++;
+  results.push({ q: quiz[current].q, correct: false, yourAnswer: 'Skipped', rightAnswer: (quiz[current].multi ? quiz[current].ans : [quiz[current].ans]).map(i => quiz[current].opts[i]).join(', '), explain: quiz[current].explain });
+  document.getElementById('s-wrong').textContent = wrong;
+  if (current < quiz.length - 1) { current++; renderQuestion(); }
+  else showResults();
+}
+
+function nextQuestion() {
+  if (current < quiz.length - 1) { current++; renderQuestion(); }
+  else showResults();
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('progress-bar').style.width = '100%';
+
+  const pct = Math.round((score / quiz.length) * 100);
+  const pass = pct >= 70;
+  const m = String(Math.floor(seconds/60)).padStart(2,'0');
+  const s = String(seconds%60).padStart(2,'0');
+
+  // Domain breakdown
+  const domainScores = {};
+  quiz.forEach((q, i) => {
+    if (!domainScores[q.domain]) domainScores[q.domain] = { total: 0, correct: 0 };
+    domainScores[q.domain].total++;
+    if (results[i].correct) domainScores[q.domain].correct++;
+  });
+
+  let bdHtml = '';
+  for (const d in domainScores) {
+    const ds = domainScores[d];
+    const dp = Math.round((ds.correct / ds.total) * 100);
+    bdHtml += `<div class="bd-item"><div class="bd-domain">${DOMAIN_NAMES[d]}</div><div class="bd-score" style="color:${dp>=70?'#22c55e':'#ef4444'}">${ds.correct}/${ds.total} (${dp}%)</div></div>`;
+  }
+
+  // Review wrong answers
+  let reviewHtml = '';
+  results.forEach((r, i) => {
+    if (!r.correct) {
+      reviewHtml += `<div class="review-item">
+        <div class="ri-header"><span class="ri-status wrong">${r.yourAnswer === 'Skipped' ? 'SKIPPED' : 'WRONG'}</span></div>
+        <div class="ri-q">${i+1}. ${r.q}</div>
+        <div class="ri-answer">Your answer: ${r.yourAnswer}<br>Correct: ${r.rightAnswer}<br>${r.explain}</div>
+      </div>`;
+    }
+  });
+
+  const el = document.getElementById('results-screen');
+  el.innerHTML = `
+    <h2>${pass ? 'Congratulations!' : 'Keep Studying!'}</h2>
+    <p style="color:#889">${pass ? 'You passed the practice quiz!' : 'You need 70% to pass. Review the topics below.'}</p>
+    <div class="score-circle ${pass?'pass':'fail'}">
+      ${pct}%
+      <span class="pct-label">${score}/${quiz.length}</span>
+    </div>
+    <p style="color:#889;margin-bottom:8px">Time: ${m}:${s}</p>
+    <div class="breakdown">${bdHtml}</div>
+    ${reviewHtml ? '<h3 style="margin:20px 0 12px;text-align:left">Review incorrect answers</h3>' : '<p style="color:#22c55e;font-weight:600">Perfect score!</p>'}
+    <div class="review-list">${reviewHtml}</div>
+    <div class="actions" style="margin-top:30px">
+      <button class="btn btn-outline" onclick="retryWrong()">Retry Wrong Only</button>
+      <button class="btn" onclick="restart()">New Quiz</button>
+    </div>
+  `;
+  el.classList.remove('hidden');
+}
+
+function restart() {
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+}
+
+function retryWrong() {
+  const wrongQs = quiz.filter((q, i) => !results[i].correct);
+  if (wrongQs.length === 0) { restart(); return; }
+  quiz = shuffle([...wrongQs]);
+  current = 0; score = 0; wrong = 0; results = []; answered = false; seconds = 0;
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  startTimer();
+  renderQuestion();
+}
+</script>
+</body>
+</html>

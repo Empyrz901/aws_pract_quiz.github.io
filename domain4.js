@@ -1287,5 +1287,173 @@ const DOMAIN4_QUESTIONS = [
     ],
     ans: 1,
     explain: "AWS Solutions Architects provide technical guidance and best practices to help customers design and build well-architected solutions on AWS."
+  },
+
+  // ===== ADDITIONAL QUESTIONS TO REACH 1000 TOTAL =====
+
+  // 4.1 Additional Pricing Models
+  {
+    domain: 4,
+    task: "4.1",
+    q: "A company runs batch processing jobs that can be interrupted and restarted. Which EC2 pricing option would be MOST cost-effective?",
+    opts: ["On-Demand Instances", "Reserved Instances", "Spot Instances", "Dedicated Hosts"],
+    ans: 2,
+    explain: "Spot Instances offer up to 90% discount compared to On-Demand prices and are ideal for fault-tolerant, interruptible workloads like batch processing."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which pricing model charges based on the number of requests and the duration of code execution?",
+    opts: ["Amazon EC2 On-Demand", "AWS Lambda", "Amazon RDS Reserved Instances", "AWS Outposts"],
+    ans: 1,
+    explain: "AWS Lambda pricing is based on the number of requests and the compute time consumed (measured in GB-seconds), with no charge when code is not running."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which statement about data transfer pricing in AWS is correct?",
+    opts: ["Data transfer into AWS from the internet is always free", "Data transfer between Regions is always free", "Data transfer out to the internet is always free", "All data transfer within the same Availability Zone is charged"],
+    ans: 0,
+    explain: "AWS does not charge for inbound data transfer from the internet to AWS services. Outbound data transfer and cross-Region transfers incur charges."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "A company wants to run a relational database 24/7 for three years. Which pricing approach offers the GREATEST savings?",
+    opts: ["On-Demand pricing", "1-year Reserved Instance with no upfront payment", "3-year Reserved Instance with all upfront payment", "Spot Instance pricing"],
+    ans: 2,
+    explain: "A 3-year Reserved Instance with all upfront payment provides the maximum discount (up to 72%) for steady-state workloads like a continuously running database."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which AWS service automatically provides a free tier that includes 750 hours per month of a t2.micro or t3.micro instance for the first 12 months?",
+    opts: ["AWS Lambda", "Amazon EC2", "Amazon Redshift", "AWS Fargate"],
+    ans: 1,
+    explain: "Amazon EC2 includes 750 hours per month of t2.micro or t3.micro instance usage in the AWS Free Tier for the first 12 months after account creation."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "What is a key financial advantage of Savings Plans over traditional Reserved Instances?",
+    opts: ["Savings Plans are always cheaper than Reserved Instances", "Savings Plans offer flexibility across instance families, sizes, OS, and tenancy", "Savings Plans do not require any commitment period", "Savings Plans only apply to Amazon S3 storage"],
+    ans: 1,
+    explain: "Compute Savings Plans provide flexibility to change instance families, sizes, OS, and tenancy while still receiving discounted pricing, unlike standard Reserved Instances."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which Amazon S3 storage class is the MOST cost-effective for data that is rarely accessed and can tolerate retrieval times of 12 hours?",
+    opts: ["S3 Standard", "S3 Standard-Infrequent Access", "S3 Glacier Deep Archive", "S3 One Zone-Infrequent Access"],
+    ans: 2,
+    explain: "S3 Glacier Deep Archive is the lowest-cost S3 storage class, designed for data that is rarely accessed and where retrieval times of 12 hours are acceptable."
+  },
+
+  // 4.2 Additional Billing & Cost Management
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which AWS tool allows you to visualize, understand, and manage your AWS costs and usage over time?",
+    opts: ["AWS Budgets", "AWS Cost Explorer", "AWS Pricing Calculator", "AWS Trusted Advisor"],
+    ans: 1,
+    explain: "AWS Cost Explorer provides an interactive interface to visualize and analyze your AWS spending patterns, forecast future costs, and identify cost optimization opportunities."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "A company wants to receive an alert when their monthly AWS spending exceeds $5,000. Which service should they use?",
+    opts: ["AWS Cost Explorer", "AWS Budgets", "AWS Pricing Calculator", "Amazon CloudWatch"],
+    ans: 1,
+    explain: "AWS Budgets allows you to set custom cost thresholds and receive alerts (via email or SNS) when your actual or forecasted spending exceeds the defined budget amount."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which feature of AWS Organizations can help a company save money by combining usage across multiple AWS accounts?",
+    opts: ["Service Control Policies", "Consolidated billing", "AWS CloudFormation StackSets", "IAM Identity Center"],
+    ans: 1,
+    explain: "Consolidated billing in AWS Organizations combines usage from all member accounts to qualify for volume pricing discounts and share Reserved Instance benefits."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which AWS tool helps estimate the cost of a proposed AWS architecture before deployment?",
+    opts: ["AWS Cost Explorer", "AWS Budgets", "AWS Pricing Calculator", "AWS Cost and Usage Report"],
+    ans: 2,
+    explain: "AWS Pricing Calculator lets you model your AWS solutions and estimate costs before deploying, helping with budgeting and architecture planning."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "What is the MOST detailed AWS cost management tool that provides comprehensive data about costs and usage, downloadable as a CSV file?",
+    opts: ["AWS Budgets", "AWS Cost Explorer", "AWS Cost and Usage Report", "AWS Billing Dashboard"],
+    ans: 2,
+    explain: "The AWS Cost and Usage Report (CUR) is the most comprehensive cost dataset, providing line-item detail for every charge and can be delivered to an S3 bucket as CSV files."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "How can cost allocation tags help an organization manage AWS costs?",
+    opts: ["They automatically reduce costs by optimizing resources", "They allow organizations to categorize and track AWS costs by project, department, or environment", "They provide volume discounts on tagged resources", "They encrypt billing data for security compliance"],
+    ans: 1,
+    explain: "Cost allocation tags let you label AWS resources with metadata (e.g., department, project) so you can categorize, filter, and track costs at a granular level in billing reports."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which AWS service provides recommendations to help reduce costs by identifying idle or underutilized resources?",
+    opts: ["AWS Budgets", "AWS Trusted Advisor", "AWS Config", "Amazon Inspector"],
+    ans: 1,
+    explain: "AWS Trusted Advisor analyzes your AWS environment and provides cost optimization recommendations, including identifying idle resources, underutilized instances, and unused Elastic IPs."
+  },
+
+  // 4.3 Additional Support & Resources
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which AWS Support plan provides access to the full set of Trusted Advisor checks?",
+    opts: ["Basic", "Developer", "Business", "Only Enterprise"],
+    ans: 2,
+    explain: "Business, Enterprise On-Ramp, and Enterprise Support plans provide access to the full set of AWS Trusted Advisor checks. Basic and Developer plans only get core checks."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "A company wants to use infrastructure as code templates and pre-built solutions vetted by AWS. Which resource should they use?",
+    opts: ["AWS Marketplace", "AWS Quick Starts and AWS Solutions Library", "AWS Training and Certification", "AWS Personal Health Dashboard"],
+    ans: 1,
+    explain: "AWS Quick Starts and the AWS Solutions Library provide vetted, automated reference deployments and CloudFormation templates for common architectural patterns."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "What is the response time for a production system down case under the AWS Business Support plan?",
+    opts: ["15 minutes", "1 hour", "4 hours", "12 hours"],
+    ans: 1,
+    explain: "AWS Business Support provides a 1-hour response time for production system down cases, while Enterprise Support offers a 15-minute response time for critical issues."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which AWS resource provides a personalized view of the health of AWS services that power your applications?",
+    opts: ["AWS Trusted Advisor", "AWS Health Dashboard — Your account health", "Amazon CloudWatch", "AWS CloudTrail"],
+    ans: 1,
+    explain: "AWS Health Dashboard (Your account health) provides personalized alerts and remediation guidance when AWS events may affect your specific resources and accounts."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which AWS program provides credits, training, and technical support specifically for startup companies?",
+    opts: ["AWS Partner Network", "AWS Activate", "AWS Enterprise Support", "AWS Professional Services"],
+    ans: 1,
+    explain: "AWS Activate provides startups with AWS credits, technical support, training, and other resources to help them get started and grow on AWS."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "A company needs help migrating a complex legacy application to AWS. Which resource provides direct assistance from AWS experts for this type of engagement?",
+    opts: ["AWS Trusted Advisor", "AWS Support Center", "AWS Professional Services", "AWS re:Post"],
+    ans: 2,
+    explain: "AWS Professional Services is a global team of experts that helps customers achieve their desired outcomes through paid engagements, including complex migrations and modernizations."
   }
 ];

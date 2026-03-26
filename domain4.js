@@ -1004,10 +1004,10 @@ const DOMAIN4_QUESTIONS = [
   {
     domain: 4,
     task: "4.3",
-    q: "Which AWS Support plan offers a response time of less than 1 hour for production system impaired cases?",
+    q: "Which AWS Support plan offers a response time of less than 1 hour for production system down cases?",
     opts: ["Basic", "Developer", "Business", "Enterprise only"],
     ans: 2,
-    explain: "Business, Enterprise On-Ramp, and Enterprise Support plans offer a less than 1-hour response time for production system impaired cases."
+    explain: "Business and above offer a less than 1-hour response time for production system down cases."
   },
   {
     domain: 4,
@@ -1709,7 +1709,7 @@ const DOMAIN4_QUESTIONS = [
   { domain: 4, task: "4.3", q: "What is the response time for a business-critical system down case under the Enterprise Support plan?", opts: ["Less than 4 hours", "Less than 1 hour", "Less than 15 minutes", "Immediate, no waiting"], ans: 2, explain: "Enterprise Support guarantees a < 15-minute response for business-critical system down (Sev 1) cases." },
   { domain: 4, task: "4.3", q: "Which AWS program provides AWS credits, training, and support to early-stage startups?", opts: ["AWS Marketplace", "AWS Activate", "AWS IQ", "AWS re:Start"], ans: 1, explain: "AWS Activate offers startups free credits, training, and technical support to help them build on AWS." },
   { domain: 4, task: "4.3", q: "Which AWS Support plan is the minimum required to open an unlimited number of support cases?", opts: ["Basic", "Developer", "Business", "Enterprise"], ans: 1, explain: "Developer plan allows unlimited support cases; Basic plan allows only limited account and billing cases." },
-  { domain: 4, task: "4.3", q: "What is AWS IQ?", opts: ["An AI-powered cost optimization tool", "A platform to hire AWS-certified freelance experts for project work", "An internal AWS training program", "A monitoring dashboard for AWS services"], ans: 1, explain: "AWS IQ connects customers with AWS-certified third-party experts for on-demand project assistance." },
+  { domain: 4, task: "4.3", q: "Which AWS resource provides self-paced digital courses and classroom training for AWS services?", opts: ["AWS re:Post", "AWS Skill Builder and AWS Training", "AWS Trusted Advisor", "AWS Config"], ans: 1, explain: "AWS Skill Builder and AWS Training offer self-paced courses and instructor-led classes for learning AWS." },
   { domain: 4, task: "4.3", q: "Which of the following Support plans includes Infrastructure Event Management (IEM) for an additional fee?", opts: ["Developer", "Business", "Enterprise On-Ramp", "Enterprise"], ans: 1, explain: "Business Support customers can purchase Infrastructure Event Management as an add-on for planned events." },
   { domain: 4, task: "4.3", q: "Which AWS service provides a personalized view of AWS service health events affecting your account?", opts: ["AWS Trusted Advisor", "AWS Personal Health Dashboard (AWS Health)", "Amazon CloudWatch", "AWS Config"], ans: 1, explain: "AWS Health (Personal Health Dashboard) shows service events and maintenance that impact your specific resources." }
 ];

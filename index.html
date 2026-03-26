@@ -64,6 +64,12 @@
   .option.picked .letter { background: #ff9900; color: #000; }
   .multi-hint { text-align: center; color: #ff9900; font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; }
 
+  /* Flag button */
+  .btn-flag { background: transparent; border: 2px solid #ef4444; color: #ef4444; padding: 10px 18px;
+    border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .btn-flag:hover { background: #ef444420; }
+  .flag-icon::before { content: "\26A0"; }
+
   /* Explanation */
   .explanation { background: #12202e; border-left: 4px solid #ff9900; border-radius: 0 10px 10px 0;
     padding: 16px 20px; margin-top: 20px; font-size: 0.9rem; line-height: 1.5; color: #bcc; display: none; }
@@ -185,6 +191,7 @@
     </div>
 
     <div class="actions">
+      <button class="btn-flag hidden" id="btn-flag" onclick="toggleFlag()"><span class="flag-icon"></span> Flag</button>
       <button class="btn btn-outline hidden" id="btn-skip" onclick="skipQuestion()">Skip</button>
       <button class="btn hidden" id="btn-submit" onclick="submitMulti()">Submit</button>
       <button class="btn hidden" id="btn-next" onclick="nextQuestion()">Next</button>
@@ -216,6 +223,7 @@ const DOMAIN_NAMES = {
 
 let quiz = [], current = 0, score = 0, wrong = 0, answered = false, results = [], timerInterval, seconds = 0;
 let selectedDomain = "all";
+const GITHUB_REPO = 'Empyrz901/aws_pract_quiz.github.io';
 
 document.getElementById('all-count').textContent = ALL_QUESTIONS.length + ' Q';
 
@@ -291,6 +299,7 @@ function renderQuestion() {
   exp.classList.remove('show');
   exp.textContent = '';
 
+  document.getElementById('btn-flag').classList.remove('hidden');
   document.getElementById('btn-skip').classList.remove('hidden');
   document.getElementById('btn-submit').classList.add('hidden');
   document.getElementById('btn-next').classList.add('hidden');
@@ -400,6 +409,40 @@ function skipQuestion() {
 function nextQuestion() {
   if (current < quiz.length - 1) { current++; renderQuestion(); }
   else showResults();
+}
+
+function toggleFlag() {
+  const q = quiz[current];
+  const letters = 'ABCDE';
+  const ansIdxs = q.multi ? q.ans : [q.ans];
+  const correctAns = ansIdxs.map(i => `${letters[i]}) ${q.opts[i]}`).join('\n');
+  const allOpts = q.opts.map((o, i) => `${letters[i]}) ${o}`).join('\n');
+
+  const title = encodeURIComponent(`[Flag] D${q.domain} T${q.task}: ${q.q.substring(0, 60)}...`);
+  const body = encodeURIComponent(
+`## Flagged Question
+
+**Domain:** ${q.domain} — ${DOMAIN_NAMES[q.domain]}
+**Task:** ${q.task}
+
+### Question
+${q.q}
+
+### Options
+${allOpts}
+
+### Current Answer
+${correctAns}
+
+### Explanation
+${q.explain}
+
+---
+**What seems wrong?**
+<!-- Describe the issue: wrong answer, outdated info, unclear wording, etc. -->
+
+`);
+  window.open(`https://github.com/${GITHUB_REPO}/issues/new?title=${title}&body=${body}&labels=flagged-question`, '_blank');
 }
 
 function showResults() {

@@ -165,9 +165,6 @@
       <label style="margin-left:12px">
         <input type="checkbox" id="shuffle-toggle" checked style="accent-color:#ff9900"> Shuffle
       </label>
-      <label style="margin-left:12px">
-        <input type="checkbox" id="skip-toggle" checked style="accent-color:#ff9900"> Allow skip
-      </label>
     </div>
     <button class="btn" onclick="startQuiz()">Start Quiz</button>
   </div>
@@ -196,7 +193,6 @@
     <div class="actions">
       <button class="btn-flag hidden" id="btn-flag" onclick="toggleFlag()" title="Report an error in this question via GitHub"><span class="flag-icon"></span> Report error</button>
       <button class="btn btn-outline hidden" id="btn-prev" onclick="prevQuestion()">Prev</button>
-      <button class="btn btn-outline hidden" id="btn-skip" onclick="skipQuestion()">Skip</button>
       <button class="btn hidden" id="btn-submit" onclick="submitMulti()">Submit</button>
       <button class="btn hidden" id="btn-next" onclick="nextQuestion()">Next</button>
     </div>
@@ -229,7 +225,6 @@ let quiz = [], current = 0, score = 0, wrong = 0, answered = false, results = []
 let selectedDomain = "all";
 const GITHUB_REPO = 'Empyrz901/aws_pract_quiz.github.io';
 const EXAM_WEIGHTS = { 1: 0.24, 2: 0.30, 3: 0.34, 4: 0.12 };
-let allowSkip = true;
 
 document.getElementById('all-count').textContent = ALL_QUESTIONS.length + ' Q';
 
@@ -262,7 +257,6 @@ function weightedDraw(pool, count) {
 }
 
 function startQuiz() {
-  allowSkip = document.getElementById('skip-toggle').checked;
   const doShuffle = document.getElementById('shuffle-toggle').checked;
   let pool = selectedDomain === "all" ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.domain == selectedDomain);
   if (doShuffle) pool = shuffle(pool);
@@ -350,11 +344,12 @@ function renderQuestion() {
 
   document.getElementById('btn-flag').classList.remove('hidden');
   document.getElementById('btn-prev').classList.toggle('hidden', current === 0);
-  document.getElementById('btn-skip').classList.toggle('hidden', alreadyAnswered || !allowSkip);
   document.getElementById('btn-submit').classList.add('hidden');
-  document.getElementById('btn-next').classList.toggle('hidden', !alreadyAnswered);
+  document.getElementById('btn-next').classList.remove('hidden');
   if (alreadyAnswered) {
     document.getElementById('btn-next').textContent = current < quiz.length - 1 ? 'Next' : 'See Results';
+  } else {
+    document.getElementById('btn-next').textContent = current < quiz.length - 1 ? 'Next' : 'Finish';
   }
 }
 
@@ -444,20 +439,9 @@ function showPostAnswer() {
   exp.textContent = quiz[current].explain;
   exp.classList.add('show');
 
-  document.getElementById('btn-skip').classList.add('hidden');
   document.getElementById('btn-submit').classList.add('hidden');
   document.getElementById('btn-next').classList.remove('hidden');
   document.getElementById('btn-next').textContent = current < quiz.length - 1 ? 'Next' : 'See Results';
-}
-
-function skipQuestion() {
-  if (answered) return;
-  answered = true;
-  wrong++;
-  results[current] = { q: quiz[current].q, correct: false, yourAnswer: 'Skipped', rightAnswer: (quiz[current].multi ? quiz[current].ans : [quiz[current].ans]).map(i => quiz[current].opts[i]).join(', '), explain: quiz[current].explain, _picks: [] };
-  document.getElementById('s-wrong').textContent = wrong;
-  if (current < quiz.length - 1) { current++; renderQuestion(); }
-  else showResults();
 }
 
 function prevQuestion() {

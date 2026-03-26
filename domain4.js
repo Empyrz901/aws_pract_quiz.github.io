@@ -1455,5 +1455,208 @@ const DOMAIN4_QUESTIONS = [
     opts: ["AWS Trusted Advisor", "AWS Support Center", "AWS Professional Services", "AWS re:Post"],
     ans: 2,
     explain: "AWS Professional Services is a global team of experts that helps customers achieve their desired outcomes through paid engagements, including complex migrations and modernizations."
+  },
+
+  // ===== ADDITIONAL MULTI-ANSWER QUESTIONS =====
+
+  // 4.1 Pricing Models — Multi-answer (5 questions)
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which of the following are valid use cases for EC2 Spot Instances? (Select TWO)",
+    opts: [
+      "Stateless web front-ends behind a load balancer",
+      "Primary production database hosting",
+      "Genomics and scientific research workloads",
+      "Real-time payment processing systems",
+      "Domain name registration"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "Spot Instances are ideal for fault-tolerant workloads such as stateless web tiers behind load balancers and scientific research. They are unsuitable for workloads that cannot tolerate interruptions, like databases or payment processing."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "A company wants to reduce compute costs across EC2, Lambda, and Fargate. Which TWO strategies can help achieve this goal? (Select TWO)",
+    opts: [
+      "Purchase a Compute Savings Plan with a 1-year or 3-year commitment",
+      "Enable S3 Transfer Acceleration on all buckets",
+      "Right-size instances using AWS Compute Optimizer recommendations",
+      "Enable versioning on all EBS volumes",
+      "Use AWS Direct Connect for all internet traffic"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "Compute Savings Plans apply discounts across EC2, Lambda, and Fargate usage. AWS Compute Optimizer analyzes utilization metrics and recommends right-sized instance types to eliminate waste."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which of the following statements about the AWS Free Tier are correct? (Select TWO)",
+    opts: [
+      "Amazon DynamoDB offers 25 GB of storage as part of the Always Free tier",
+      "The Free Tier is available only to accounts created in the US East (N. Virginia) region",
+      "Amazon CloudFront offers 1 TB of data transfer out per month for 12 months free",
+      "AWS CloudFormation is always free to use; you pay only for the underlying resources it provisions",
+      "The 12 Months Free EC2 benefit continues indefinitely if usage stays below the threshold"
+    ],
+    ans: [0, 3],
+    multi: true,
+    explain: "DynamoDB provides 25 GB of free storage that never expires (Always Free). AWS CloudFormation itself has no additional charge; you only pay for the AWS resources created by your stacks."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which of the following pricing factors apply to Amazon RDS? (Select THREE)",
+    opts: [
+      "Instance type and size (e.g., db.m5.large)",
+      "Number of IAM users who connect to the database",
+      "Amount of provisioned storage (GB per month)",
+      "Data transfer out to the internet",
+      "Number of tables in the database"
+    ],
+    ans: [0, 2, 3],
+    multi: true,
+    explain: "Amazon RDS pricing is based on the DB instance type, provisioned storage (and type), data transfer out, and optional features like Multi-AZ and read replicas. IAM user counts and table counts do not affect pricing."
+  },
+  {
+    domain: 4,
+    task: "4.1",
+    q: "Which of the following are characteristics of EC2 Dedicated Hosts? (Select TWO)",
+    opts: [
+      "They allow you to use your existing per-socket or per-core software licenses",
+      "They offer up to 90% discount compared to On-Demand pricing",
+      "They provide visibility into the number of sockets and physical cores on the server",
+      "They are available only in the US East (N. Virginia) region",
+      "They are automatically shared with other AWS accounts in your organization"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "Dedicated Hosts provide a physical server dedicated to your use with visibility into sockets and cores, enabling bring-your-own-license (BYOL) compliance for server-bound software licenses."
+  },
+
+  // 4.2 Billing, Budget, Cost Management — Multi-answer (4 questions)
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which of the following are capabilities of AWS Cost Explorer? (Select TWO)",
+    opts: [
+      "Forecasting future costs based on historical usage patterns",
+      "Automatically terminating idle EC2 instances to save money",
+      "Providing Savings Plans purchase recommendations",
+      "Enforcing Service Control Policies across member accounts",
+      "Deploying CloudFormation stacks to reduce costs"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "AWS Cost Explorer can forecast future costs for up to 12 months and provides Savings Plans recommendations based on your historical usage patterns to help reduce spending."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "A finance team wants granular visibility into AWS spending. Which TWO approaches provide detailed cost breakdowns? (Select TWO)",
+    opts: [
+      "Enable the AWS Cost and Usage Report with hourly granularity delivered to S3",
+      "Use AWS CloudTrail to track all API costs",
+      "Apply user-defined cost allocation tags and filter by them in Cost Explorer",
+      "Enable VPC Flow Logs for all subnets",
+      "Configure AWS Config rules for cost tracking"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "The AWS Cost and Usage Report provides the most detailed billing data at hourly or daily granularity. Cost allocation tags let you slice costs by custom dimensions like team, project, or environment in Cost Explorer."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which of the following are benefits of consolidated billing in AWS Organizations? (Select THREE)",
+    opts: [
+      "A single payment method for all member accounts",
+      "Aggregated usage across accounts qualifies for tiered volume discounts",
+      "Reserved Instance and Savings Plan discounts are shared across the organization",
+      "All member accounts automatically receive Enterprise Support at no extra cost",
+      "Service Control Policies are applied to billing automatically"
+    ],
+    ans: [0, 1, 2],
+    multi: true,
+    explain: "Consolidated billing provides a single invoice and payment method, aggregates usage for volume discounts on services like S3, and shares RI and Savings Plan benefits across all member accounts."
+  },
+  {
+    domain: 4,
+    task: "4.2",
+    q: "Which of the following actions can help a company reduce unexpected AWS charges? (Select TWO)",
+    opts: [
+      "Set up AWS Budgets with alert thresholds and automated actions",
+      "Enable Amazon CloudWatch billing alarms to notify when estimated charges exceed a limit",
+      "Use AWS CloudFormation to deploy all resources",
+      "Store all data in S3 Glacier Deep Archive",
+      "Create a separate VPC for each application"
+    ],
+    ans: [0, 1],
+    multi: true,
+    explain: "AWS Budgets can send alerts and trigger automated actions when spending exceeds thresholds. CloudWatch billing alarms provide notifications when estimated charges surpass a configured dollar amount."
+  },
+
+  // 4.3 Technical Resources and Support — Multi-answer (4 questions)
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which of the following features are included in the AWS Enterprise Support plan but NOT in the Business Support plan? (Select TWO)",
+    opts: [
+      "A designated Technical Account Manager (TAM)",
+      "Full set of Trusted Advisor checks",
+      "15-minute response time for business-critical system down cases",
+      "24/7 access to Cloud Support Engineers via phone and chat",
+      "Access to the AWS Health API"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "Enterprise Support provides a designated TAM and a 15-minute response time for critical issues. Business Support includes full Trusted Advisor, 24/7 engineer access, and Health API, but does not include a designated TAM or the 15-minute SLA."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which of the following AWS resources can help a team learn AWS services and prepare for certification exams? (Select TWO)",
+    opts: [
+      "AWS Training and Certification digital courses and labs",
+      "AWS Cost and Usage Report",
+      "AWS Skill Builder platform",
+      "AWS Config conformance packs",
+      "Amazon Inspector assessment templates"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "AWS Training and Certification offers instructor-led and digital courses, hands-on labs, and certification exams. AWS Skill Builder is a learning platform providing hundreds of self-paced courses and practice exams."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "A company is evaluating third-party software to deploy on AWS. Which TWO resources should they consult? (Select TWO)",
+    opts: [
+      "AWS Marketplace for pre-configured software listings with flexible pricing",
+      "AWS Partner Network (APN) to find technology partners with validated solutions",
+      "AWS Trusted Advisor cost optimization checks",
+      "AWS CloudTrail event history",
+      "Amazon CloudWatch Logs Insights"
+    ],
+    ans: [0, 1],
+    multi: true,
+    explain: "AWS Marketplace offers a curated catalog of third-party software that can be purchased and deployed directly on AWS. The APN includes technology partners whose solutions are validated to work on AWS."
+  },
+  {
+    domain: 4,
+    task: "4.3",
+    q: "Which of the following Trusted Advisor checks are available to customers on the Basic Support plan? (Select TWO)",
+    opts: [
+      "S3 bucket permissions checking for public access",
+      "Low-utilization Amazon EC2 instances",
+      "Service limits (service quotas) usage",
+      "Idle load balancers",
+      "Underutilized Amazon EBS volumes"
+    ],
+    ans: [0, 2],
+    multi: true,
+    explain: "Basic and Developer Support customers have access to core Trusted Advisor checks, which include security checks like S3 bucket permissions and service limits checks. Cost optimization checks like idle load balancers and underutilized resources require Business Support or higher."
   }
 ];

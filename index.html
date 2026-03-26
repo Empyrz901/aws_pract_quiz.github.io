@@ -165,6 +165,9 @@
       <label style="margin-left:12px">
         <input type="checkbox" id="shuffle-toggle" checked style="accent-color:#ff9900"> Shuffle
       </label>
+      <label style="margin-left:12px">
+        <input type="checkbox" id="skip-toggle" checked style="accent-color:#ff9900"> Allow skip
+      </label>
     </div>
     <button class="btn" onclick="startQuiz()">Start Quiz</button>
   </div>
@@ -191,7 +194,8 @@
     </div>
 
     <div class="actions">
-      <button class="btn-flag hidden" id="btn-flag" onclick="toggleFlag()"><span class="flag-icon"></span> Flag</button>
+      <button class="btn-flag hidden" id="btn-flag" onclick="toggleFlag()" title="Report an error in this question via GitHub"><span class="flag-icon"></span> Report error</button>
+      <button class="btn btn-outline hidden" id="btn-prev" onclick="prevQuestion()">Prev</button>
       <button class="btn btn-outline hidden" id="btn-skip" onclick="skipQuestion()">Skip</button>
       <button class="btn hidden" id="btn-submit" onclick="submitMulti()">Submit</button>
       <button class="btn hidden" id="btn-next" onclick="nextQuestion()">Next</button>
@@ -224,6 +228,8 @@ const DOMAIN_NAMES = {
 let quiz = [], current = 0, score = 0, wrong = 0, answered = false, results = [], timerInterval, seconds = 0;
 let selectedDomain = "all";
 const GITHUB_REPO = 'Empyrz901/aws_pract_quiz.github.io';
+const EXAM_WEIGHTS = { 1: 0.24, 2: 0.30, 3: 0.34, 4: 0.12 };
+let allowSkip = true;
 
 document.getElementById('all-count').textContent = ALL_QUESTIONS.length + ' Q';
 
@@ -241,13 +247,35 @@ function shuffle(arr) {
   return arr;
 }
 
+function weightedDraw(pool, count) {
+  let picked = [];
+  for (const domain in EXAM_WEIGHTS) {
+    const domainPool = shuffle(pool.filter(q => q.domain == domain));
+    const n = Math.round(count * EXAM_WEIGHTS[domain]);
+    picked = picked.concat(domainPool.slice(0, n));
+  }
+  // Fill any rounding gaps
+  const pickedSet = new Set(picked);
+  const remaining = shuffle(pool.filter(q => !pickedSet.has(q)));
+  while (picked.length < count && remaining.length) picked.push(remaining.shift());
+  return shuffle(picked).slice(0, count);
+}
+
 function startQuiz() {
+  allowSkip = document.getElementById('skip-toggle').checked;
+  const doShuffle = document.getElementById('shuffle-toggle').checked;
   let pool = selectedDomain === "all" ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.domain == selectedDomain);
-  if (document.getElementById('shuffle-toggle').checked) pool = shuffle(pool);
+  if (doShuffle) pool = shuffle(pool);
   let count = parseInt(document.getElementById('q-count').value);
   if (count === 0 || count > pool.length) count = pool.length;
-  quiz = pool.slice(0, count);
-  current = 0; score = 0; wrong = 0; results = []; answered = false; seconds = 0;
+
+  // Use weighted draw for exam-length when all domains selected
+  if (count === 65 && selectedDomain === "all") {
+    quiz = weightedDraw(pool, 65);
+  } else {
+    quiz = pool.slice(0, count);
+  }
+  current = 0; score = 0; wrong = 0; results = new Array(quiz.length).fill(null); answered = false; seconds = 0;
 
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('results-screen').classList.add('hidden');
@@ -270,7 +298,8 @@ let multiSelections = [];
 
 function renderQuestion() {
   const q = quiz[current];
-  answered = false;
+  const alreadyAnswered = results[current] !== null;
+  answered = alreadyAnswered;
   multiSelections = [];
   document.getElementById('s-question').textContent = `${current+1}/${quiz.length}`;
   document.getElementById('s-correct').textContent = score;
@@ -296,13 +325,37 @@ function renderQuestion() {
   document.getElementById('q-options').innerHTML = hintHtml + optsHtml;
 
   const exp = document.getElementById('q-explanation');
-  exp.classList.remove('show');
-  exp.textContent = '';
+
+  // Restore state if already answered (navigating back)
+  if (alreadyAnswered) {
+    const correctIndices = isMulti ? q.ans : [q.ans];
+    const optEls = document.querySelectorAll('.option');
+    optEls.forEach(el => {
+      el.classList.add('disabled');
+      const i = parseInt(el.dataset.idx);
+      if (correctIndices.includes(i)) el.classList.add('correct');
+    });
+    // Show wrong picks
+    const r = results[current];
+    if (!r.correct && r.yourAnswer !== 'Skipped') {
+      const yourIdxs = r._picks || [];
+      yourIdxs.forEach(i => { if (!correctIndices.includes(i)) optEls[i].classList.add('wrong'); });
+    }
+    exp.textContent = q.explain;
+    exp.classList.add('show');
+  } else {
+    exp.classList.remove('show');
+    exp.textContent = '';
+  }
 
   document.getElementById('btn-flag').classList.remove('hidden');
-  document.getElementById('btn-skip').classList.remove('hidden');
+  document.getElementById('btn-prev').classList.toggle('hidden', current === 0);
+  document.getElementById('btn-skip').classList.toggle('hidden', alreadyAnswered || !allowSkip);
   document.getElementById('btn-submit').classList.add('hidden');
-  document.getElementById('btn-next').classList.add('hidden');
+  document.getElementById('btn-next').classList.toggle('hidden', !alreadyAnswered);
+  if (alreadyAnswered) {
+    document.getElementById('btn-next').textContent = current < quiz.length - 1 ? 'Next' : 'See Results';
+  }
 }
 
 function selectOption(idx) {
@@ -328,7 +381,7 @@ function selectOption(idx) {
       score++;
     }
 
-    results.push({ q: q.q, correct: isCorrect, yourAnswer: q.opts[idx], rightAnswer: correctIndices.map(i => q.opts[i]).join(', '), explain: q.explain });
+    results[current] = { q: q.q, correct: isCorrect, yourAnswer: q.opts[idx], rightAnswer: correctIndices.map(i => q.opts[i]).join(', '), explain: q.explain, _picks: [idx] };
     showPostAnswer();
     return;
   }
@@ -379,7 +432,7 @@ function submitMulti() {
 
   if (!isCorrect) { wrong++; } else { score++; }
 
-  results.push({ q: q.q, correct: isCorrect, yourAnswer: multiSelections.map(i => q.opts[i]).join(', '), rightAnswer: correctIndices.map(i => q.opts[i]).join(', '), explain: q.explain });
+  results[current] = { q: q.q, correct: isCorrect, yourAnswer: multiSelections.map(i => q.opts[i]).join(', '), rightAnswer: correctIndices.map(i => q.opts[i]).join(', '), explain: q.explain, _picks: [...multiSelections] };
   showPostAnswer();
 }
 
@@ -399,11 +452,16 @@ function showPostAnswer() {
 
 function skipQuestion() {
   if (answered) return;
+  answered = true;
   wrong++;
-  results.push({ q: quiz[current].q, correct: false, yourAnswer: 'Skipped', rightAnswer: (quiz[current].multi ? quiz[current].ans : [quiz[current].ans]).map(i => quiz[current].opts[i]).join(', '), explain: quiz[current].explain });
+  results[current] = { q: quiz[current].q, correct: false, yourAnswer: 'Skipped', rightAnswer: (quiz[current].multi ? quiz[current].ans : [quiz[current].ans]).map(i => quiz[current].opts[i]).join(', '), explain: quiz[current].explain, _picks: [] };
   document.getElementById('s-wrong').textContent = wrong;
   if (current < quiz.length - 1) { current++; renderQuestion(); }
   else showResults();
+}
+
+function prevQuestion() {
+  if (current > 0) { current--; renderQuestion(); }
 }
 
 function nextQuestion() {
@@ -446,6 +504,15 @@ ${q.explain}
 }
 
 function showResults() {
+  // Mark any unanswered questions as skipped
+  results.forEach((r, i) => {
+    if (r === null) {
+      results[i] = { q: quiz[i].q, correct: false, yourAnswer: 'Skipped', rightAnswer: (quiz[i].multi ? quiz[i].ans : [quiz[i].ans]).map(j => quiz[i].opts[j]).join(', '), explain: quiz[i].explain, _picks: [] };
+    }
+  });
+  score = results.filter(r => r.correct).length;
+  wrong = results.filter(r => !r.correct).length;
+
   clearInterval(timerInterval);
   document.getElementById('quiz-screen').classList.add('hidden');
   document.getElementById('progress-bar').style.width = '100%';
@@ -509,10 +576,10 @@ function restart() {
 }
 
 function retryWrong() {
-  const wrongQs = quiz.filter((q, i) => !results[i].correct);
+  const wrongQs = quiz.filter((q, i) => results[i] && !results[i].correct);
   if (wrongQs.length === 0) { restart(); return; }
   quiz = shuffle([...wrongQs]);
-  current = 0; score = 0; wrong = 0; results = []; answered = false; seconds = 0;
+  current = 0; score = 0; wrong = 0; results = new Array(quiz.length).fill(null); answered = false; seconds = 0;
   document.getElementById('results-screen').classList.add('hidden');
   document.getElementById('quiz-screen').classList.remove('hidden');
   startTimer();
